@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><artifacts>
+    <artifact name="Employee" groupId="amniltech.rigoes.dataservice" version="1.0.0" type="service/dataservice" serverRole="DataServicesServer">
+        <file>dataservice/Employee.dbs</file>
+    </artifact>
+</artifacts>

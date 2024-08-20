@@ -1,0 +1,31 @@
+<data name="Rigo" serviceGroup="" serviceNamespace="" transports="http https">
+   <description/>
+   <config id="hrdb">
+      <property name="driverClassName">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+      <property name="url">jdbc:sqlserver://cicd.server247.info:14333;databaseName=HumanResourceDB;encrypt=false;trustServerCertificate=false;</property>
+      <property name="username"></property>
+      <property name="password"></property>
+   </config>
+   <query id="GetEmployees" useConfig="hrdb">
+      <sql>SELECT           Id,    FirstName,    MiddleName,    LastName,    EmployeeCode,    PhoneNumber,    EmailAddress,    DateOfBirth,    DateOfJoin,    Department,    Designation,    CreatedOn,    LastModifiedOn FROM      dbo.Employee    where :empCode is null or EmployeeCode  =  :empCode ; </sql>
+      <param name="empCode" optional="true" paramType="SCALAR" sqlType="STRING" type="IN"/>
+      <result outputType="json" useColumnNumbers="true">{  "entries": {    "entry": [      {        "id": "$1",        "firstName": "$2",        "middleName": "$3",        "lastName": "$4",        "employeeCode": "$5",        "phoneNumber": "$6",        "emailAddress": "$7",        "dateOfBirth": "$8",        "dateOfJoin": "$9",        "department": "$10",        "designation": "$11",        "createdOn": "$12",        "lastModifiedOn": "$13"      }    ]  }}</result>
+   </query>
+   <query id="GetLeaves" useConfig="hrdb">
+      <sql>SELECT Id, EmployeeId, LeaveType, LeaveDate, LeaveRequestedOn, IsApproved FROM dbo.LeaveRequest WHERE (( :filterBy = 'Today' AND CAST(LeaveDate AS DATE) = CAST(GETDATE() AS DATE)) OR ( :filterBy = 'Week' AND DATEPART(WEEK, LeaveDate) = DATEPART(WEEK, GETDATE()) AND DATEPART(YEAR, LeaveDate) = DATEPART(YEAR, GETDATE())) OR ( :filterBy = 'Month' AND DATEPART(MONTH, LeaveDate) = DATEPART(MONTH, GETDATE()) AND DATEPART(YEAR, LeaveDate) = DATEPART(YEAR, GETDATE())));</sql>
+      <param name="filterBy" optional="true" paramType="SCALAR" sqlType="STRING" type="IN"/>
+      <result outputType="json" useColumnNumbers="true">{  "entries": {    "entry": [      {        "id": "$1",        "employeeId": "$2",        "leaveType": "$3",        "leaveDate": "$4",        "leaveRequestedOn": "$5",        "isApproved": "$6"      }    ]  }}</result>
+   </query>
+   <resource method="GET" path="/employees">
+      <description/>
+      <call-query href="GetEmployees">
+         <with-param name="empCode" query-param="empCode"/>
+      </call-query>
+   </resource>
+   <resource method="GET" path="/leaves">
+      <description/>
+      <call-query href="GetLeaves">
+         <with-param name="filterBy" query-param="filterBy"/>
+      </call-query>
+   </resource>
+</data>
